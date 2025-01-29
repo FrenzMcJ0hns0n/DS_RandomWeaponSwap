@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DS_RandomWeaponSwap", "DS_RandomWeaponSwap\DS_RandomWeaponSwap.vbproj", "{9CB8ED5E-574A-44D3-94D3-358CF503D907}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9CB8ED5E-574A-44D3-94D3-358CF503D907}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CB8ED5E-574A-44D3-94D3-358CF503D907}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CB8ED5E-574A-44D3-94D3-358CF503D907}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CB8ED5E-574A-44D3-94D3-358CF503D907}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8541037F-7CA2-4822-ABD2-2084B47BE6AF}
+	EndGlobalSection
+EndGlobal
