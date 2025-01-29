@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DS_RandomWeaponSwap"
         mc:Ignorable="d"
-        Title="DS(R) Weapon Swap" Height="300" Width="400" Loaded="Window_Loaded">
+        Title="DS(R) Weapon Swap" Height="300" Width="400" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid Margin="12">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -26,7 +26,7 @@
 
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0 0 0 8">
             <Label Content="Update interval :" VerticalContentAlignment="Center"/>
-            <TextBox x:Name="Tbx_Interval" Text="1" Width="24" VerticalContentAlignment="Center" TextChanged="Tbx_Interval_TextChanged" Loaded="Tbx_Interval_Loaded"/>
+            <TextBox x:Name="Tbx_Interval" Text="1" Width="24" VerticalContentAlignment="Center" Loaded="Tbx_Interval_Loaded" PreviewTextInput="Tbx_Interval_PreviewTextInput"/>
             <StackPanel Orientation="Vertical">
                 <Button x:Name="Btn_IntervalMore" Content=" ↑ " VerticalContentAlignment="Center" Click="Btn_IntervalMore_Click"/>
                 <Button x:Name="Btn_IntervalLess" Content=" ↓ " VerticalContentAlignment="Center" Click="Btn_IntervalLess_Click"/>

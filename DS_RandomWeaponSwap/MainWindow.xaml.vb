@@ -2,16 +2,13 @@
 
 Class MainWindow
     Private isRunning As Boolean = False
-    Private intervalInSeconds As Integer = 5
-
-    Private Sub Window_Loaded(sender As Object, e As RoutedEventArgs)
-        'GetProcessModule()
-        'FetchResourceData()
-
-        'Run()
-    End Sub
+    Private intervalInSeconds As Integer = 5 'Default value. TODO: Manage in settings
+    Private Const minInterval As Integer = 3
+    Private Const maxInterval As Integer = 60
 
     Private Async Sub Run()
+        'TODO: Save settings
+
         isRunning = True
         Lbl_Status.Content = "Running!"
         Lbl_Status.FontWeight = FontWeights.DemiBold
@@ -20,8 +17,7 @@ Class MainWindow
         Dim swapper As New WeaponSwapper()
 
         'TEST
-        'Dim weaponId As Integer = swapper.ReadFromMemory()
-        'Debug.Print($"Id of current R1 weapon : {weaponId}")
+        'Debug.Print($"Id of current R1 weapon : {swapper.ReadFromMemory()}")
 
         Dim timer As New PeriodicTimer(TimeSpan.FromSeconds(intervalInSeconds))
         While isRunning AndAlso Await timer.WaitForNextTickAsync()
@@ -37,31 +33,32 @@ Class MainWindow
         Lbl_Status.ClearValue(Label.ForegroundProperty)
     End Sub
 
+
+    Private Sub Window_Loaded(sender As Object, e As RoutedEventArgs)
+        'TODO: Load settings
+    End Sub
+
+
     Private Sub Tbx_Interval_Loaded(sender As TextBox, e As RoutedEventArgs)
-        'intervalInSeconds = sender.Text
         sender.Text = intervalInSeconds
     End Sub
 
-    Private Sub Tbx_Interval_TextChanged(sender As TextBox, e As TextChangedEventArgs)
+    Private Sub Tbx_Interval_PreviewTextInput(sender As TextBox, e As TextCompositionEventArgs)
+        If Not Integer.TryParse(e.Text, Nothing) Then
+            MessageBox.Show("Input error : Only numeric values are allowed")
+            e.Handled = True
+            Return
+        End If
 
-        ''MessageBox.Show(e.Source.GetType().ToString)
-        'MessageBox.Show(e.Handled)
+        Dim interval As Integer = Convert.ToInt32(e.Text)
+        If interval < minInterval OrElse interval > maxInterval Then
+            MessageBox.Show($"Input error : Interval must be between {minInterval} and {maxInterval} seconds")
+            e.Handled = True
+        End If
 
-        'If Not Integer.TryParse(sender.Text, Nothing) Then
-        '    MessageBox.Show("Only numeric values are allowed")
-        '    sender.Text = intervalInSeconds
-        '    Return
-        'End If
-
-        'Dim interval As Integer = Convert.ToInt32(sender.Text)
-        'If interval < 3 OrElse interval > 60 Then
-        '    MessageBox.Show("Interval must be between 3 and 60 seconds")
-        '    sender.Text = intervalInSeconds
-        '    Return
-        'End If
-
-        'intervalInSeconds = interval
+        intervalInSeconds = interval
     End Sub
+
 
     Private Sub Btn_Run_Click(sender As Object, e As RoutedEventArgs)
         Run()
@@ -71,14 +68,28 @@ Class MainWindow
         isRunning = False
     End Sub
 
+
     Private Sub Btn_IntervalMore_Click(sender As Object, e As RoutedEventArgs)
-        'Dim tbxInterval As TextBox = Tbx_Interval
-        'tbxInterval.Text = Convert.ToInt32(tbxInterval.Text) + 1
+        Dim tbxInterval As TextBox = Tbx_Interval
+        Dim currentInterval As Integer = Convert.ToInt32(tbxInterval.Text)
+
+        If currentInterval < maxInterval Then
+            currentInterval += 1
+            tbxInterval.Text = currentInterval
+            intervalInSeconds = currentInterval
+        End If
     End Sub
 
     Private Sub Btn_IntervalLess_Click(sender As Object, e As RoutedEventArgs)
-        'Dim tbxInterval As TextBox = Tbx_Interval
-        'tbxInterval.Text = Convert.ToInt32(tbxInterval.Text) - 1
+        Dim tbxInterval As TextBox = Tbx_Interval
+        Dim currentInterval As Integer = Convert.ToInt32(tbxInterval.Text)
+
+        If currentInterval > minInterval Then
+            currentInterval -= 1
+            tbxInterval.Text = currentInterval
+            intervalInSeconds = currentInterval
+        End If
     End Sub
+
 
 End Class
