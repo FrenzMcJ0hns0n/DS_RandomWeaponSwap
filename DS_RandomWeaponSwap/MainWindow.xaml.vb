@@ -1,14 +1,18 @@
 ﻿Imports System.Threading
 
 Class MainWindow
+    Private settings As UserSettings
     Private isRunning As Boolean = False
-    Private intervalInSeconds As Integer = 5 'Default value. TODO: Manage in settings
+    Private intervalInSeconds As Integer = 5 'Default value (if no user settings)
     Private Const minInterval As Integer = 3
     Private Const maxInterval As Integer = 60
 
     Private Async Sub Run()
-        'TODO: Save settings
+        'Persist user settings
+        settings.Interval = intervalInSeconds
+        SaveSettings(settings)
 
+        'Now do your job, program!
         isRunning = True
         Lbl_Status.Content = "Running!"
         Lbl_Status.FontWeight = FontWeights.DemiBold
@@ -35,7 +39,11 @@ Class MainWindow
 
 
     Private Sub Window_Loaded(sender As Object, e As RoutedEventArgs)
-        'TODO: Load settings
+        settings = LoadSettings()
+
+        If settings.Interval IsNot Nothing Then
+            intervalInSeconds = settings.Interval
+        End If
     End Sub
 
 
