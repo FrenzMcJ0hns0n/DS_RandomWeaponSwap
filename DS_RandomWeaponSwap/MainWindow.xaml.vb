@@ -1,11 +1,15 @@
 ﻿Imports System.Threading
 
 Class MainWindow
+
     Private settings As UserSettings
     Private isRunning As Boolean = False
-    Private intervalInSeconds As Integer = 5 'Default value (if no user settings)
+
+    Private Const defInterval As Integer = 5 'Default value
     Private Const minInterval As Integer = 3
     Private Const maxInterval As Integer = 60
+    Private intervalInSeconds As Integer
+
 
     Private Async Sub Run()
         'Persist user settings
@@ -42,7 +46,11 @@ Class MainWindow
         settings = LoadSettings()
 
         If settings.Interval IsNot Nothing Then
-            intervalInSeconds = settings.Interval
+            If settings.Interval >= minInterval AndAlso settings.Interval >= minInterval Then
+                intervalInSeconds = settings.Interval
+            Else
+                intervalInSeconds = defInterval
+            End If
         End If
     End Sub
 
@@ -51,6 +59,8 @@ Class MainWindow
         sender.Text = intervalInSeconds
     End Sub
 
+
+    'TODO: Improve. PreviewTextInput is not a very good method to validate user input (e.g does not work with Enter nor 0)
     Private Sub Tbx_Interval_PreviewTextInput(sender As TextBox, e As TextCompositionEventArgs)
         If Not Integer.TryParse(e.Text, Nothing) Then
             MessageBox.Show("Input error : Only numeric values are allowed")
@@ -79,24 +89,34 @@ Class MainWindow
 
     Private Sub Btn_IntervalMore_Click(sender As Object, e As RoutedEventArgs)
         Dim tbxInterval As TextBox = Tbx_Interval
-        Dim currentInterval As Integer = Convert.ToInt32(tbxInterval.Text)
 
-        If currentInterval < maxInterval Then
-            currentInterval += 1
-            tbxInterval.Text = currentInterval
-            intervalInSeconds = currentInterval
+        If Not String.IsNullOrEmpty(tbxInterval.Text) Then
+            Dim currentInterval As Integer = Convert.ToInt32(tbxInterval.Text)
+
+            If currentInterval < maxInterval Then
+                currentInterval += 1
+
+                tbxInterval.Text = currentInterval
+                intervalInSeconds = currentInterval
+            End If
         End If
+
     End Sub
 
     Private Sub Btn_IntervalLess_Click(sender As Object, e As RoutedEventArgs)
         Dim tbxInterval As TextBox = Tbx_Interval
-        Dim currentInterval As Integer = Convert.ToInt32(tbxInterval.Text)
 
-        If currentInterval > minInterval Then
-            currentInterval -= 1
-            tbxInterval.Text = currentInterval
-            intervalInSeconds = currentInterval
+        If Not String.IsNullOrEmpty(tbxInterval.Text) Then
+            Dim currentInterval As Integer = Convert.ToInt32(tbxInterval.Text)
+
+            If currentInterval > minInterval Then
+                currentInterval -= 1
+
+                tbxInterval.Text = currentInterval
+                intervalInSeconds = currentInterval
+            End If
         End If
+
     End Sub
 
 
