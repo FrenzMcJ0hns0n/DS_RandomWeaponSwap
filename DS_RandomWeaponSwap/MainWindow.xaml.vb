@@ -2,6 +2,8 @@
 
 Class MainWindow
 
+    Private isDebug As Boolean = Debugger.IsAttached 'Best way?
+
     Private settings As UserSettings
     Private isRunning As Boolean = False
 
@@ -23,21 +25,19 @@ Class MainWindow
         Lbl_Status.Foreground = Brushes.Green
 
         Dim swapper As New WeaponSwapper()
-
-        'TEST
-        'Debug.Print($"Id of current R1 weapon : {swapper.ReadFromMemory()}")
+        If isDebug Then Debug.Print($"Id of current R1 weapon : {swapper.ReadFromMemory()}")
 
         Dim timer As New PeriodicTimer(TimeSpan.FromSeconds(intervalInSeconds))
-        While isRunning AndAlso Await timer.WaitForNextTickAsync()
+        While Await timer.WaitForNextTickAsync()
+            If Not isRunning Then Exit While
+
             Dim weapon As Weapon = swapper.GetRandomWeapon()
-
-            'TEST
-            'Debug.Print($"(Swap every {intervalInSeconds}s) Random weapon: {weapon.Name} ({weapon.Id})")
-
+            If isDebug Then Debug.Print($"(Swap every {intervalInSeconds}s) Random weapon: {weapon.Name} ({weapon.Id})")
             swapper.WriteIntoMemory(weapon.Id)
         End While
 
         Lbl_Status.Content = "Idle"
+        Lbl_Status.ClearValue(Label.FontWeightProperty)
         Lbl_Status.ClearValue(Label.ForegroundProperty)
     End Sub
 
@@ -45,12 +45,12 @@ Class MainWindow
     Private Sub Window_Loaded(sender As Object, e As RoutedEventArgs)
         settings = LoadSettings()
 
-        If settings.Interval IsNot Nothing Then
-            If settings.Interval >= minInterval AndAlso settings.Interval >= minInterval Then
-                intervalInSeconds = settings.Interval
-            Else
-                intervalInSeconds = defInterval
-            End If
+        If settings.Interval IsNot Nothing AndAlso
+           settings.Interval >= minInterval AndAlso
+           settings.Interval <= maxInterval Then
+            intervalInSeconds = settings.Interval
+        Else
+            intervalInSeconds = defInterval
         End If
     End Sub
 
@@ -60,21 +60,21 @@ Class MainWindow
     End Sub
 
 
-    'TODO: Improve. PreviewTextInput is not a very good method to validate user input (e.g does not work with Enter nor 0)
+    'This is bad. TODO: Replace it with a Focus-oriented logic
     Private Sub Tbx_Interval_PreviewTextInput(sender As TextBox, e As TextCompositionEventArgs)
-        If Not Integer.TryParse(e.Text, Nothing) Then
-            MessageBox.Show("Input error : Only numeric values are allowed")
-            e.Handled = True
-            Return
-        End If
+        'If Not Integer.TryParse(e.Text, Nothing) Then
+        '    MessageBox.Show("Input error : Only numeric values are allowed")
+        '    e.Handled = True
+        '    Return
+        'End If
 
-        Dim interval As Integer = Convert.ToInt32(e.Text)
-        If interval < minInterval OrElse interval > maxInterval Then
-            MessageBox.Show($"Input error : Interval must be between {minInterval} and {maxInterval} seconds")
-            e.Handled = True
-        End If
+        'Dim interval As Integer = Convert.ToInt32(e.Text)
+        'If interval < minInterval OrElse interval > maxInterval Then
+        '    MessageBox.Show($"Input error : Interval must be between {minInterval} and {maxInterval} seconds")
+        '    e.Handled = True
+        'End If
 
-        intervalInSeconds = interval
+        'intervalInSeconds = interval
     End Sub
 
 
@@ -83,41 +83,32 @@ Class MainWindow
     End Sub
 
     Private Sub Btn_Stop_Click(sender As Object, e As RoutedEventArgs)
+        Lbl_Status.Content = "Stopping..."
+        Lbl_Status.Foreground = Brushes.Red
         isRunning = False
     End Sub
 
 
     Private Sub Btn_IntervalMore_Click(sender As Object, e As RoutedEventArgs)
-        Dim tbxInterval As TextBox = Tbx_Interval
-
-        If Not String.IsNullOrEmpty(tbxInterval.Text) Then
-            Dim currentInterval As Integer = Convert.ToInt32(tbxInterval.Text)
-
-            If currentInterval < maxInterval Then
-                currentInterval += 1
-
-                tbxInterval.Text = currentInterval
-                intervalInSeconds = currentInterval
-            End If
-        End If
-
+        UpdateInterval(1)
     End Sub
 
     Private Sub Btn_IntervalLess_Click(sender As Object, e As RoutedEventArgs)
-        Dim tbxInterval As TextBox = Tbx_Interval
-
-        If Not String.IsNullOrEmpty(tbxInterval.Text) Then
-            Dim currentInterval As Integer = Convert.ToInt32(tbxInterval.Text)
-
-            If currentInterval > minInterval Then
-                currentInterval -= 1
-
-                tbxInterval.Text = currentInterval
-                intervalInSeconds = currentInterval
-            End If
-        End If
-
+        UpdateInterval(-1)
     End Sub
 
+    Private Sub UpdateInterval(valueToAdd As Integer)
+        Dim tbxInterval As TextBox = Tbx_Interval
+
+        Dim currentInterval As Integer
+        If Integer.TryParse(tbxInterval.Text, currentInterval) AndAlso
+            (valueToAdd > 0 AndAlso currentInterval + valueToAdd <= maxInterval) OrElse
+            (valueToAdd < 0 AndAlso currentInterval + valueToAdd >= minInterval) Then
+
+            currentInterval += valueToAdd
+            tbxInterval.Text = currentInterval
+            intervalInSeconds = currentInterval
+        End If
+    End Sub
 
 End Class
