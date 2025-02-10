@@ -2,7 +2,7 @@
 
 Class MainWindow
 
-    Private isDebug As Boolean = Debugger.IsAttached 'Best way?
+    Private ReadOnly isDebug As Boolean = Debugger.IsAttached
 
     Private settings As UserSettings
     Private isRunning As Boolean = False
@@ -13,16 +13,73 @@ Class MainWindow
     Private intervalInSeconds As Integer
 
 
+
+    Private Sub Window_Loaded(sender As Object, e As RoutedEventArgs)
+        settings = LoadSettings()
+
+        If settings.Interval IsNot Nothing AndAlso settings.Interval >= minInterval AndAlso settings.Interval <= maxInterval Then
+            intervalInSeconds = settings.Interval
+        Else
+            intervalInSeconds = defInterval
+        End If
+    End Sub
+
+    Private Sub Tbx_Interval_Loaded(sender As TextBox, e As RoutedEventArgs)
+        sender.Text = intervalInSeconds
+    End Sub
+
+    Private Sub Tbx_Interval_GotFocus(sender As Object, e As RoutedEventArgs)
+        intervalInSeconds = Tbx_Interval.Text 'Backup value
+    End Sub
+
+    Private Sub Tbx_Interval_LostFocus(sender As Object, e As RoutedEventArgs)
+        If Not ValidateIntervalInput() Then Tbx_Interval.Text = intervalInSeconds 'Restore backup
+    End Sub
+
+    Private Sub Btn_IntervalMore_Click(sender As Object, e As RoutedEventArgs)
+        AddToInterval(1)
+    End Sub
+
+    Private Sub Btn_IntervalLess_Click(sender As Object, e As RoutedEventArgs)
+        AddToInterval(-1)
+    End Sub
+
+    Private Sub Btn_Run_Click(sender As Object, e As RoutedEventArgs)
+        Run()
+    End Sub
+
+    Private Sub Btn_Stop_Click(sender As Object, e As RoutedEventArgs)
+        Lbl_Status.Content = "Stopping..."
+        Lbl_Status.Foreground = Brushes.Red
+        isRunning = False
+    End Sub
+
+
+
+    Private Sub AddToInterval(valueToAdd As Integer)
+        Dim tbxInterval As TextBox = Tbx_Interval
+
+        Dim currentInterval As Integer
+        If Integer.TryParse(tbxInterval.Text, currentInterval) AndAlso
+            (valueToAdd > 0 AndAlso currentInterval + valueToAdd <= maxInterval) OrElse
+            (valueToAdd < 0 AndAlso currentInterval + valueToAdd >= minInterval) Then
+
+            currentInterval += valueToAdd
+            tbxInterval.Text = currentInterval
+            intervalInSeconds = currentInterval
+        End If
+    End Sub
+
     Private Async Sub Run()
+        If Not ValidateIntervalInput() Then Return
+
         'Persist user settings
         settings.Interval = intervalInSeconds
         SaveSettings(settings)
 
         'Now do your job, program!
         isRunning = True
-        Lbl_Status.Content = "Running!"
-        Lbl_Status.FontWeight = FontWeights.DemiBold
-        Lbl_Status.Foreground = Brushes.Green
+        UpdateControls(isRunning)
 
         Dim swapper As New WeaponSwapper()
         If isDebug Then Debug.Print($"Id of current R1 weapon : {swapper.ReadFromMemory()}")
@@ -36,79 +93,45 @@ Class MainWindow
             swapper.WriteIntoMemory(weapon.Id)
         End While
 
-        Lbl_Status.Content = "Idle"
-        Lbl_Status.ClearValue(Label.FontWeightProperty)
-        Lbl_Status.ClearValue(Label.ForegroundProperty)
+        UpdateControls(isRunning)
     End Sub
 
-
-    Private Sub Window_Loaded(sender As Object, e As RoutedEventArgs)
-        settings = LoadSettings()
-
-        If settings.Interval IsNot Nothing AndAlso
-           settings.Interval >= minInterval AndAlso
-           settings.Interval <= maxInterval Then
-            intervalInSeconds = settings.Interval
+    Private Sub UpdateControls(isRunning As Boolean)
+        If isRunning Then
+            Lbl_Status.Content = "Running!"
+            Btn_Run.IsEnabled = False
+            Btn_Stop.IsEnabled = True
+            Btn_IntervalMore.IsEnabled = False
+            Btn_IntervalLess.IsEnabled = False
+            Tbx_Interval.IsEnabled = False
+            Lbl_Status.FontWeight = FontWeights.DemiBold
+            Lbl_Status.Foreground = Brushes.Green
         Else
-            intervalInSeconds = defInterval
+            Lbl_Status.Content = "Idle"
+            Btn_Run.IsEnabled = True
+            Btn_Stop.IsEnabled = False
+            Btn_IntervalMore.IsEnabled = True
+            Btn_IntervalLess.IsEnabled = True
+            Tbx_Interval.IsEnabled = True
+            Lbl_Status.ClearValue(Label.FontWeightProperty)
+            Lbl_Status.ClearValue(Label.ForegroundProperty)
         End If
     End Sub
 
+    Private Function ValidateIntervalInput() As Boolean
+        Dim input As Integer
 
-    Private Sub Tbx_Interval_Loaded(sender As TextBox, e As RoutedEventArgs)
-        sender.Text = intervalInSeconds
-    End Sub
-
-
-    'This is bad. TODO: Replace it with a Focus-oriented logic
-    Private Sub Tbx_Interval_PreviewTextInput(sender As TextBox, e As TextCompositionEventArgs)
-        'If Not Integer.TryParse(e.Text, Nothing) Then
-        '    MessageBox.Show("Input error : Only numeric values are allowed")
-        '    e.Handled = True
-        '    Return
-        'End If
-
-        'Dim interval As Integer = Convert.ToInt32(e.Text)
-        'If interval < minInterval OrElse interval > maxInterval Then
-        '    MessageBox.Show($"Input error : Interval must be between {minInterval} and {maxInterval} seconds")
-        '    e.Handled = True
-        'End If
-
-        'intervalInSeconds = interval
-    End Sub
-
-
-    Private Sub Btn_Run_Click(sender As Object, e As RoutedEventArgs)
-        Run()
-    End Sub
-
-    Private Sub Btn_Stop_Click(sender As Object, e As RoutedEventArgs)
-        Lbl_Status.Content = "Stopping..."
-        Lbl_Status.Foreground = Brushes.Red
-        isRunning = False
-    End Sub
-
-
-    Private Sub Btn_IntervalMore_Click(sender As Object, e As RoutedEventArgs)
-        UpdateInterval(1)
-    End Sub
-
-    Private Sub Btn_IntervalLess_Click(sender As Object, e As RoutedEventArgs)
-        UpdateInterval(-1)
-    End Sub
-
-    Private Sub UpdateInterval(valueToAdd As Integer)
-        Dim tbxInterval As TextBox = Tbx_Interval
-
-        Dim currentInterval As Integer
-        If Integer.TryParse(tbxInterval.Text, currentInterval) AndAlso
-            (valueToAdd > 0 AndAlso currentInterval + valueToAdd <= maxInterval) OrElse
-            (valueToAdd < 0 AndAlso currentInterval + valueToAdd >= minInterval) Then
-
-            currentInterval += valueToAdd
-            tbxInterval.Text = currentInterval
-            intervalInSeconds = currentInterval
+        If Not Integer.TryParse(Tbx_Interval.Text, input) Then
+            MessageBox.Show("Only numeric values are allowed", "Input error", MessageBoxButton.OK, MessageBoxImage.Error)
+            Return False
         End If
-    End Sub
+
+        If input < minInterval OrElse input > maxInterval Then
+            MessageBox.Show($"Interval must be between {minInterval} and {maxInterval} seconds", "Input error", MessageBoxButton.OK, MessageBoxImage.Error)
+            Return False
+        End If
+
+        Return True
+    End Function
 
 End Class

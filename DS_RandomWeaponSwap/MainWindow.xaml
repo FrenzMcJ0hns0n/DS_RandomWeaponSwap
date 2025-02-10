@@ -26,15 +26,15 @@
 
         <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0 0 0 8">
             <Label Content="Update interval :" VerticalContentAlignment="Center"/>
-            <TextBox x:Name="Tbx_Interval" Text="1" Width="24" VerticalContentAlignment="Center" Loaded="Tbx_Interval_Loaded" PreviewTextInput="Tbx_Interval_PreviewTextInput" />
+            <TextBox x:Name="Tbx_Interval" Text="1" Width="24" VerticalContentAlignment="Center" Loaded="Tbx_Interval_Loaded" GotFocus="Tbx_Interval_GotFocus" LostFocus="Tbx_Interval_LostFocus" />
             <StackPanel Orientation="Vertical">
-                <Button x:Name="Btn_IntervalMore" Content=" ↑ " VerticalContentAlignment="Center" Click="Btn_IntervalMore_Click"/>
-                <Button x:Name="Btn_IntervalLess" Content=" ↓ " VerticalContentAlignment="Center" Click="Btn_IntervalLess_Click"/>
+                <Button x:Name="Btn_IntervalMore" FontSize="12" Content=" ⮝ " Click="Btn_IntervalMore_Click"/>
+                <Button x:Name="Btn_IntervalLess" FontSize="12" Content=" ⮟ " Click="Btn_IntervalLess_Click"/>
             </StackPanel>
         </StackPanel>
 
-        <Button x:Name="Btn_Run" Grid.Row="3" Grid.Column="1" Background="#ccffcc" Content="Run!" Margin="0 0 1 20" Click="Btn_Run_Click"/>
-        <Button x:Name="Btn_Stop" Grid.Row="3" Grid.Column="2" Background="#ffece6" Content="Stop" Margin="1 0 0 20" Click="Btn_Stop_Click" />
+        <Button x:Name="Btn_Run" Grid.Row="3" Grid.Column="1" Background="#ccffcc" Content="Run!" Margin="0 0 1 20" Click="Btn_Run_Click" />
+        <Button x:Name="Btn_Stop" Grid.Row="3" Grid.Column="2" Background="#ffece6" Content="Stop" Margin="1 0 0 20" Click="Btn_Stop_Click" IsEnabled="False"/>
 
         <Label Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Content="Status :"/>
         <Label x:Name="Lbl_Status" Grid.Row="5" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Idle"/>

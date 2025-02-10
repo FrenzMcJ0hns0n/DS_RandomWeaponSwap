@@ -38,7 +38,7 @@ Module IOHelper
             Dim errMsg As String = $"Error while loading user settings from file ""{SETTINGS_FILE}"" : {ex}"
             WriteLog(errMsg)
             Debug.Print(errMsg)
-            'MessageBox.Show(errMsg, "Error: missing data", MessageBoxButton.OK, MessageBoxImage.Error)
+            MessageBox.Show(errMsg, "Data error", MessageBoxButton.OK, MessageBoxImage.Error)
 
         End Try
 
@@ -58,7 +58,7 @@ Module IOHelper
             Dim errMsg As String = $"Error while saving user settings to file ""{SETTINGS_FILE}"" : {ex}"
             WriteLog(errMsg)
             Debug.Print(errMsg)
-            'MessageBox.Show(errMsg, "Error: missing data", MessageBoxButton.OK, MessageBoxImage.Error)
+            MessageBox.Show(errMsg, "Data error", MessageBoxButton.OK, MessageBoxImage.Error)
 
         End Try
 
@@ -71,18 +71,18 @@ Module IOHelper
         If Not File.Exists(weaponsFilePath) Then
             Dim errMsg As String = $"File ""{WEAPONS_FILE}"" not found. Please verify your installation"
             WriteLog(errMsg)
-            Debug.Print(errMsg)
-            'MessageBox.Show(errMsg, "Error: missing data", MessageBoxButton.OK, MessageBoxImage.Error)
+            MessageBox.Show(errMsg, "Resource error", MessageBoxButton.OK, MessageBoxImage.Error)
         End If
 
         Try
             Dim weaponsJsonData As String = File.ReadAllText(weaponsFilePath)
             weapons = JsonSerializer.Deserialize(Of List(Of Weapon))(weaponsJsonData)
+
         Catch ex As Exception
             Dim errMsg As String = $"Failed to load weapons data from resource file : {ex}"
             WriteLog(errMsg)
-            Debug.Print(errMsg)
-            'MessageBox.Show(errMsg, "Error: cannot load data", MessageBoxButton.OK, MessageBoxImage.Error)
+            MessageBox.Show(errMsg, "Data error", MessageBoxButton.OK, MessageBoxImage.Error)
+
         End Try
 
         Return weapons

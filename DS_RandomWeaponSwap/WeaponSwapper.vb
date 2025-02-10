@@ -25,9 +25,8 @@ Public Class WeaponSwapper
                 If processes.Length = 1 Then
                     _GameProcess = processes(0)
                 Else
-                    Dim errMsg As String = $"Error while retrieving process {PROCESS_NAME} : wrong number of processes. Expected 1. Provided {processes.Length}"
+                    Dim errMsg As String = $"Wrong number of processes for {PROCESS_NAME}: expected 1, provided {processes.Length}"
                     WriteLog(errMsg)
-                    Debug.Print(errMsg)
                     MessageBox.Show(errMsg, "Error while retrieving process", MessageBoxButton.OK, MessageBoxImage.Error)
                 End If
 
@@ -165,7 +164,6 @@ Public Class WeaponSwapper
         Catch ex As Exception
             Dim errMsg As String = $"An unexpected error occurred. Details: {ex}"
             WriteLog(errMsg)
-            Debug.Print(errMsg)
 
         Finally
             CloseHandle(GameProcessPtr())
