@@ -78,11 +78,11 @@ Class MainWindow
         SaveSettings(settings)
 
         'Now do your job, program!
-        isRunning = True
-        UpdateControls(isRunning)
-
         Dim swapper As New WeaponSwapper()
         If isDebug Then Debug.Print($"Id of current R1 weapon : {swapper.ReadFromMemory()}")
+
+        isRunning = True
+        UpdateControls(isRunning)
 
         Dim timer As New PeriodicTimer(TimeSpan.FromSeconds(intervalInSeconds))
         While Await timer.WaitForNextTickAsync()
