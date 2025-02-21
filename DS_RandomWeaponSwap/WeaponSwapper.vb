@@ -11,6 +11,28 @@ Public Class WeaponSwapper
     Private Const MAIN_MODULE_NAME As String = "DarkSoulsRemastered.exe"
     Private Const R1_WEAPON_BASE_ADDRESS As Integer = &H1C823A0
     Private ReadOnly R1WeaponOffsets As New List(Of Integer) From {&H8, &H0, &H7E8, &H28, &H328}
+    Private ReadOnly MeleeCategories As New List(Of String) From {
+        "Daggers",
+        "Straight Swords",
+        "Greatswords",
+        "Ultra Greatswords",
+        "Curved Swords",
+        "Curved Greatswords",
+        "Katanas",
+        "Piercing Swords",
+        "Axes",
+        "Great Axes",
+        "Hammers",
+        "Great Hammers",
+        "Fist Weapons",
+        "Spears",
+        "Halberds",
+        "Others", 'e.g. Skull Lantern
+        "Shields",
+        "Greatshields",
+        "Whips"
+    }
+    Public MeleeWeaponsOnly As Boolean
 
 #End Region
 
@@ -105,7 +127,16 @@ Public Class WeaponSwapper
     Private _Weapons As List(Of Weapon)
     Private ReadOnly Property Weapons() As List(Of Weapon)
         Get
-            If _Weapons Is Nothing Then _Weapons = LoadWeaponData()
+            If _Weapons Is Nothing Then
+
+                Dim loadedWeapons As List(Of Weapon) = LoadWeaponData()
+                If MeleeWeaponsOnly Then
+                    _Weapons = loadedWeapons.Where(Function(w As Weapon) MeleeCategories.Contains(w.Category)).ToList
+                Else
+                    _Weapons = loadedWeapons
+                End If
+
+            End If
             Return _Weapons
         End Get
     End Property

@@ -57,7 +57,6 @@ Module IOHelper
         Catch ex As Exception
             Dim errMsg As String = $"Error while saving user settings to file ""{SETTINGS_FILE}"" : {ex}"
             WriteLog(errMsg)
-            Debug.Print(errMsg)
             MessageBox.Show(errMsg, "Data error", MessageBoxButton.OK, MessageBoxImage.Error)
 
         End Try
@@ -72,6 +71,7 @@ Module IOHelper
             Dim errMsg As String = $"File ""{WEAPONS_FILE}"" not found. Please verify your installation"
             WriteLog(errMsg)
             MessageBox.Show(errMsg, "Resource error", MessageBoxButton.OK, MessageBoxImage.Error)
+            Environment.Exit(0)
         End If
 
         Try

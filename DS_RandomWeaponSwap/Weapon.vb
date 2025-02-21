@@ -2,7 +2,6 @@
 
     Public Property Id As Integer
     Public Property Name As String
-
-    'Private Category As String 'TODO
+    Public Property Category As String
 
 End Class
