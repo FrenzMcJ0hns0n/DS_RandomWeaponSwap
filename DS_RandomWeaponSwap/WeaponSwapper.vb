@@ -1,8 +1,10 @@
-﻿Imports System.Runtime.InteropServices
+﻿Imports System.Data
+Imports System.Runtime.InteropServices
 
 ''' <summary>
 ''' This class interacts with module MemoryHander in order to actually swap weapons
 ''' </summary>
+
 Public Class WeaponSwapper
 
 #Region "Members"
@@ -135,6 +137,7 @@ Public Class WeaponSwapper
                 Else
                     _Weapons = loadedWeapons
                 End If
+                If Application.IsDebug Then Debug.Print($"Loaded {_Weapons.Count} weapons")
 
             End If
             Return _Weapons
@@ -149,7 +152,7 @@ Public Class WeaponSwapper
         'Perform at least this basic check before continuing
         If GameProcess() Is Nothing Then Environment.Exit(0)
 
-        Debug.Print("New WeaponSwapper object instantiated")
+        If Application.IsDebug Then Debug.Print("New WeaponSwapper object instantiated")
     End Sub
 
 #End Region
@@ -194,6 +197,7 @@ Public Class WeaponSwapper
 
         Catch ex As Exception
             Dim errMsg As String = $"An unexpected error occurred. Details: {ex}"
+            If Application.IsDebug Then Debug.Print(errMsg)
             WriteLog(errMsg)
 
         Finally
@@ -223,6 +227,7 @@ Public Class WeaponSwapper
 
         Catch ex As Exception
             Dim errMsg As String = $"An unexpected error occurred. Details: {ex}"
+            If Application.IsDebug Then Debug.Print(errMsg)
             WriteLog(errMsg)
 
         Finally

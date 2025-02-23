@@ -3,7 +3,6 @@
 Class MainWindow
 
     'System
-    Private ReadOnly isDebug As Boolean = Debugger.IsAttached
     Private isRunning As Boolean = False
 
     'User settings
@@ -32,12 +31,12 @@ Class MainWindow
         sender.Text = intervalInSeconds
     End Sub
 
-    Private Sub Tbx_Interval_GotFocus(sender As Object, e As RoutedEventArgs)
-        intervalInSeconds = Tbx_Interval.Text 'Backup value
+    Private Sub Tbx_Interval_GotFocus(sender As TextBox, e As RoutedEventArgs)
+        intervalInSeconds = sender.Text 'Backup value
     End Sub
 
-    Private Sub Tbx_Interval_LostFocus(sender As Object, e As RoutedEventArgs)
-        If Not ValidateIntervalInput() Then Tbx_Interval.Text = intervalInSeconds 'Restore backup
+    Private Sub Tbx_Interval_LostFocus(sender As TextBox, e As RoutedEventArgs)
+        If Not ValidateIntervalInput() Then sender.Text = intervalInSeconds 'Restore backup
     End Sub
 
     Private Sub Btn_IntervalMore_Click(sender As Object, e As RoutedEventArgs)
@@ -48,8 +47,15 @@ Class MainWindow
         AddToInterval(-1)
     End Sub
 
-    Private Sub Cbx_MeleeWpnsOnly_Loaded(sender As CheckBox, e As RoutedEventArgs)
+    Private Sub Cbx_MeleeOnly_Loaded(sender As CheckBox, e As RoutedEventArgs)
         sender.IsChecked = meleeWeaponsOnly
+    End Sub
+    Private Sub Cbx_MeleeOnly_Checked(sender As Object, e As RoutedEventArgs)
+        meleeWeaponsOnly = True
+    End Sub
+
+    Private Sub Cbx_MeleeOnly_Unchecked(sender As Object, e As RoutedEventArgs)
+        meleeWeaponsOnly = False
     End Sub
 
     Private Sub Btn_Run_Click(sender As Object, e As RoutedEventArgs)
@@ -80,7 +86,6 @@ Class MainWindow
 
     Private Async Sub Run()
         If Not ValidateIntervalInput() Then Return
-        meleeWeaponsOnly = Cbx_MeleeWpnsOnly.IsChecked 'TODO? Use Checked/Unchecked events instead
 
         'Persist user settings
         settings.Interval = intervalInSeconds
@@ -89,7 +94,7 @@ Class MainWindow
 
         'Now do your job, program!
         Dim swapper As New WeaponSwapper() With {.MeleeWeaponsOnly = meleeWeaponsOnly}
-        If isDebug Then Debug.Print($"Id of current R1 weapon : {swapper.ReadFromMemory()}")
+        If Application.IsDebug Then Debug.Print($"Id of current R1 weapon : {swapper.ReadFromMemory()}")
 
         isRunning = True
         UpdateControls(isRunning)
@@ -99,7 +104,7 @@ Class MainWindow
             If Not isRunning Then Exit While
 
             Dim weapon As Weapon = swapper.GetRandomWeapon()
-            If isDebug Then Debug.Print($"(Swap every {intervalInSeconds}s) Random weapon: Id={weapon.Id}, Name=""{weapon.Name}"", Category=""{weapon.Category}""")
+            If Application.IsDebug Then Debug.Print($"(Swap every {intervalInSeconds}s) Random R1 weapon: Id={weapon.Id}, Name=""{weapon.Name}"", Category=""{weapon.Category}""")
             swapper.WriteIntoMemory(weapon.Id)
         End While
 
@@ -114,7 +119,7 @@ Class MainWindow
             Btn_IntervalMore.IsEnabled = False
             Btn_IntervalLess.IsEnabled = False
             Tbx_Interval.IsEnabled = False
-            Cbx_MeleeWpnsOnly.IsEnabled = False
+            Cbx_MeleeOnly.IsEnabled = False
             Lbl_Status.FontWeight = FontWeights.DemiBold
             Lbl_Status.Foreground = Brushes.Green
         Else
@@ -124,7 +129,7 @@ Class MainWindow
             Btn_IntervalMore.IsEnabled = True
             Btn_IntervalLess.IsEnabled = True
             Tbx_Interval.IsEnabled = True
-            Cbx_MeleeWpnsOnly.IsEnabled = True
+            Cbx_MeleeOnly.IsEnabled = True
             Lbl_Status.ClearValue(Label.FontWeightProperty)
             Lbl_Status.ClearValue(Label.ForegroundProperty)
         End If
