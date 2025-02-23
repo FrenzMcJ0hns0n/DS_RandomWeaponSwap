@@ -1,6 +1,10 @@
 ﻿Class Application
 
-    ' Application-level events, such as Startup, Exit, and DispatcherUnhandledException
-    ' can be handled in this file.
+    'Is app launched in "Debug" mode?
+    Public Shared ReadOnly Property IsDebug As Boolean
+        Get
+            Return Debugger.IsAttached
+        End Get
+    End Property
 
 End Class

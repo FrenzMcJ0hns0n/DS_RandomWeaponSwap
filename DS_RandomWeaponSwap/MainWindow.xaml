@@ -5,39 +5,57 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DS_RandomWeaponSwap"
         mc:Ignorable="d"
-        Title="DS(R) Weapon Swap" Height="300" Width="400" Loaded="Window_Loaded">
+        Title="DS(R) Weapon Swap" Height="300" Width="380" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid Margin="12">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="2*" />
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="2*" />
+            <RowDefinition Height="1*" />
             <RowDefinition Height="2*" />
-            <RowDefinition Height="4*" />
-            <RowDefinition Height="4*" />
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="3*" />
+            <RowDefinition Height="1*" />
             <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
 
-        <Label Grid.ColumnSpan="4" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Note: only for Dark Souls Remastered" FontStyle="Italic"/>
+        <Label Grid.ColumnSpan="6" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Note: only for Dark Souls Remastered" FontStyle="Italic"/>
 
-        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0 0 0 8">
-            <Label Content="Update interval :" VerticalContentAlignment="Center"/>
-            <TextBox x:Name="Tbx_Interval" Text="1" Width="24" VerticalContentAlignment="Center" TextChanged="Tbx_Interval_TextChanged" Loaded="Tbx_Interval_Loaded"/>
-            <StackPanel Orientation="Vertical">
-                <Button x:Name="Btn_IntervalMore" Content=" ↑ " VerticalContentAlignment="Center" Click="Btn_IntervalMore_Click"/>
-                <Button x:Name="Btn_IntervalLess" Content=" ↓ " VerticalContentAlignment="Center" Click="Btn_IntervalLess_Click"/>
-            </StackPanel>
-        </StackPanel>
+        <GroupBox Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="4">
+            <GroupBox.Header>
+                <TextBlock Text="Options" Foreground="Gray"/>
+            </GroupBox.Header>
+            <Grid Margin="6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Label Content="Update interval :" VerticalContentAlignment="Center"/>
+                    <TextBox x:Name="Tbx_Interval" Text="1" Width="24" VerticalContentAlignment="Center" Loaded="Tbx_Interval_Loaded" GotFocus="Tbx_Interval_GotFocus" LostFocus="Tbx_Interval_LostFocus" />
+                    <StackPanel Orientation="Vertical">
+                        <Button x:Name="Btn_IntervalMore" FontSize="12" Content=" ⮝ " Click="Btn_IntervalMore_Click"/>
+                        <Button x:Name="Btn_IntervalLess" FontSize="12" Content=" ⮟ " Click="Btn_IntervalLess_Click"/>
+                    </StackPanel>
+                </StackPanel>
+                <CheckBox x:Name="Cbx_MeleeOnly" Grid.Row="2" HorizontalAlignment="Center" Content="Melee weapons only" IsChecked="False" Loaded="Cbx_MeleeOnly_Loaded" Checked="Cbx_MeleeOnly_Checked" Unchecked="Cbx_MeleeOnly_Unchecked"/>
+            </Grid>
+        </GroupBox>
+        
+        <Button x:Name="Btn_Run" Grid.Row="6" Grid.Column="2" Background="#ccffcc" Content="Run!" Margin="0 0 1 0" Click="Btn_Run_Click"/>
+        <Button x:Name="Btn_Stop" Grid.Row="6" Grid.Column="3" Background="#ffd6cc" Content="Stop" Margin="1 0 0 0" Click="Btn_Stop_Click" IsEnabled="False"/>
 
-        <Button x:Name="Btn_Run" Grid.Row="3" Grid.Column="1" Background="#ccffcc" Content="Run!" Margin="0 0 1 20" Click="Btn_Run_Click"/>
-        <Button x:Name="Btn_Stop" Grid.Row="3" Grid.Column="2" Background="#ffece6" Content="Stop" Margin="1 0 0 20" Click="Btn_Stop_Click" />
-
-        <Label Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Content="Status :"/>
-        <Label x:Name="Lbl_Status" Grid.Row="5" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Idle"/>
+        <Label Grid.Row="8" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Content="Status :"/>
+        <Label x:Name="Lbl_Status" Grid.Row="8" Grid.Column="3" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Idle"/>
 
     </Grid>
 </Window>

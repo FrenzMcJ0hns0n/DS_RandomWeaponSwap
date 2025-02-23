@@ -1,8 +1,10 @@
-﻿Imports System.Runtime.InteropServices
+﻿Imports System.Data
+Imports System.Runtime.InteropServices
 
 ''' <summary>
 ''' This class interacts with module MemoryHander in order to actually swap weapons
 ''' </summary>
+
 Public Class WeaponSwapper
 
 #Region "Members"
@@ -11,6 +13,28 @@ Public Class WeaponSwapper
     Private Const MAIN_MODULE_NAME As String = "DarkSoulsRemastered.exe"
     Private Const R1_WEAPON_BASE_ADDRESS As Integer = &H1C823A0
     Private ReadOnly R1WeaponOffsets As New List(Of Integer) From {&H8, &H0, &H7E8, &H28, &H328}
+    Private ReadOnly MeleeCategories As New List(Of String) From {
+        "Daggers",
+        "Straight Swords",
+        "Greatswords",
+        "Ultra Greatswords",
+        "Curved Swords",
+        "Curved Greatswords",
+        "Katanas",
+        "Piercing Swords",
+        "Axes",
+        "Great Axes",
+        "Hammers",
+        "Great Hammers",
+        "Fist Weapons",
+        "Spears",
+        "Halberds",
+        "Others", 'e.g. Skull Lantern
+        "Shields",
+        "Greatshields",
+        "Whips"
+    }
+    Public MeleeWeaponsOnly As Boolean
 
 #End Region
 
@@ -25,10 +49,9 @@ Public Class WeaponSwapper
                 If processes.Length = 1 Then
                     _GameProcess = processes(0)
                 Else
-                    Dim errMsg As String = $"Error while retrieving process {PROCESS_NAME} : wrong number of processes. Expected 1. Provided {processes.Length}"
+                    Dim errMsg As String = $"Wrong number of processes for ""{PROCESS_NAME}"": expected 1, provided {processes.Length}. Make sure the game is running."
                     WriteLog(errMsg)
-                    Debug.Print(errMsg)
-                    MessageBox.Show(errMsg, "Error while retrieving process", MessageBoxButton.OK, MessageBoxImage.Error)
+                    MessageBox.Show(errMsg, "Error while retrieving game process", MessageBoxButton.OK, MessageBoxImage.Error)
                 End If
 
             End If
@@ -106,7 +129,17 @@ Public Class WeaponSwapper
     Private _Weapons As List(Of Weapon)
     Private ReadOnly Property Weapons() As List(Of Weapon)
         Get
-            If _Weapons Is Nothing Then _Weapons = LoadWeaponData()
+            If _Weapons Is Nothing Then
+
+                Dim loadedWeapons As List(Of Weapon) = LoadWeaponData()
+                If MeleeWeaponsOnly Then
+                    _Weapons = loadedWeapons.Where(Function(w As Weapon) MeleeCategories.Contains(w.Category)).ToList
+                Else
+                    _Weapons = loadedWeapons
+                End If
+                If Application.IsDebug Then Debug.Print($"Loaded {_Weapons.Count} weapons")
+
+            End If
             Return _Weapons
         End Get
     End Property
@@ -119,7 +152,7 @@ Public Class WeaponSwapper
         'Perform at least this basic check before continuing
         If GameProcess() Is Nothing Then Environment.Exit(0)
 
-        Debug.Print("New WeaponSwapper object instantiated")
+        If Application.IsDebug Then Debug.Print("New WeaponSwapper object instantiated")
     End Sub
 
 #End Region
@@ -164,8 +197,8 @@ Public Class WeaponSwapper
 
         Catch ex As Exception
             Dim errMsg As String = $"An unexpected error occurred. Details: {ex}"
+            If Application.IsDebug Then Debug.Print(errMsg)
             WriteLog(errMsg)
-            Debug.Print(errMsg)
 
         Finally
             CloseHandle(GameProcessPtr())
@@ -194,6 +227,7 @@ Public Class WeaponSwapper
 
         Catch ex As Exception
             Dim errMsg As String = $"An unexpected error occurred. Details: {ex}"
+            If Application.IsDebug Then Debug.Print(errMsg)
             WriteLog(errMsg)
 
         Finally
