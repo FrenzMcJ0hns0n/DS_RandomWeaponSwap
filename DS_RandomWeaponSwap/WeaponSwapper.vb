@@ -11,8 +11,9 @@ Public Class WeaponSwapper
 
     Private Const PROCESS_NAME As String = "DarkSoulsRemastered"
     Private Const MAIN_MODULE_NAME As String = "DarkSoulsRemastered.exe"
-    Private Const R1_WEAPON_BASE_ADDRESS As Integer = &H1C823A0
-    Private ReadOnly R1WeaponOffsets As New List(Of Integer) From {&H8, &H0, &H7E8, &H28, &H328}
+    Private Const GAME_BASE_OFFSET As Integer = &H1C823A0
+    Private ReadOnly R1WeaponIdOffsets As New List(Of Integer) From {&H8, &H0, &H7E8, &H28, &H328}
+    Private ReadOnly R1WeaponDuraOffsets As New List(Of Integer) From {&H8, &H0, &H280, &H88, &H578, &HDB0}
     Private ReadOnly MeleeCategories As New List(Of String) From {
         "Daggers",
         "Straight Swords",
@@ -95,24 +96,46 @@ Public Class WeaponSwapper
     End Property
 
 
-    Private _R1WeaponAddress As IntPtr
-    Private ReadOnly Property R1WeaponAddress() As IntPtr
+    Private _R1WeaponIdAddress As IntPtr
+    Private ReadOnly Property R1WeaponIdAddress() As IntPtr
         Get
-            If _R1WeaponAddress = IntPtr.Zero Then
+            If _R1WeaponIdAddress = IntPtr.Zero Then
 
                 'Start from base address and move from one pointer to the next (except the last one)
-                Dim targetAddress = GetValueAtAddress(GameBaseAddress() + R1_WEAPON_BASE_ADDRESS, 8)
-                Dim maxIndex As Integer = R1WeaponOffsets.Count - 1
+                Dim targetAddress = GetValueAtAddress(GameBaseAddress() + GAME_BASE_OFFSET, 8)
+                Dim maxIndex As Integer = R1WeaponIdOffsets.Count - 1
                 For i As Integer = 0 To maxIndex
-                    targetAddress += R1WeaponOffsets.Item(i)
+                    targetAddress += R1WeaponIdOffsets.Item(i)
                     If i < maxIndex Then
                         targetAddress = GetValueAtAddress(targetAddress, 8)
                     End If
                 Next
-                _R1WeaponAddress = targetAddress
+                _R1WeaponIdAddress = targetAddress
 
             End If
-            Return _R1WeaponAddress
+            Return _R1WeaponIdAddress
+        End Get
+    End Property
+
+
+    Private _R1WeaponDuraAddress As IntPtr
+    Private ReadOnly Property R1WeaponDuraAddress() As IntPtr
+        Get
+            If _R1WeaponDuraAddress = IntPtr.Zero Then
+
+                'Start from base address and move from one pointer to the next (except the last one)
+                Dim targetAddress = GetValueAtAddress(GameBaseAddress() + GAME_BASE_OFFSET, 8)
+                Dim maxIndex As Integer = R1WeaponDuraOffsets.Count - 1
+                For i As Integer = 0 To maxIndex
+                    targetAddress += R1WeaponDuraOffsets.Item(i)
+                    If i < maxIndex Then
+                        targetAddress = GetValueAtAddress(targetAddress, 8)
+                    End If
+                Next
+                _R1WeaponDuraAddress = targetAddress
+
+            End If
+            Return _R1WeaponDuraAddress
         End Get
     End Property
 
@@ -189,7 +212,7 @@ Public Class WeaponSwapper
         Dim buffer(totalBytesToRead) As Byte
 
         Try
-            Dim success As Boolean = ReadProcessMemory(GameProcessPtr(), R1WeaponAddress(), buffer, totalBytesToRead, bytesRead)
+            Dim success As Boolean = ReadProcessMemory(GameProcessPtr(), R1WeaponIdAddress(), buffer, totalBytesToRead, bytesRead)
             If Not success Then
                 Throw New Exception($"Failed to read value from memory. Error code: {Marshal.GetLastWin32Error()}")
             End If
@@ -209,7 +232,8 @@ Public Class WeaponSwapper
         _GameProcess = Nothing
         _GameProcessPtr = IntPtr.Zero
         _GameBaseAddress = IntPtr.Zero
-        _R1WeaponAddress = IntPtr.Zero
+        _R1WeaponIdAddress = IntPtr.Zero
+        _R1WeaponDuraAddress = IntPtr.Zero
 
         Return weaponId
     End Function
@@ -217,12 +241,19 @@ Public Class WeaponSwapper
 
     Public Sub WriteIntoMemory(weaponId As Integer)
         Dim bytesWritten As IntPtr
-        Dim buffer As Byte() = BitConverter.GetBytes(weaponId)
+        Dim bufferWeaponId As Byte() = BitConverter.GetBytes(weaponId)
+
+        Dim weaponDura As Integer = 200 'TODO: Get from weapon data
+        Dim bufferWeapDura As Byte() = BitConverter.GetBytes(weaponDura)
 
         Try
-            Dim success As Boolean = WriteProcessMemory(GameProcessPtr(), R1WeaponAddress(), buffer, buffer.Length, bytesWritten)
-            If Not success Then
-                Throw New Exception($"Failed to write value ({weaponId}) into memory. Error code: {Marshal.GetLastWin32Error()}")
+            Dim successWeaponId As Boolean = WriteProcessMemory(GameProcessPtr(), R1WeaponIdAddress(), bufferWeaponId, bufferWeaponId.Length, bytesWritten)
+            If Not successWeaponId Then
+                Throw New Exception($"Failed to write Weapon Id {weaponId} into memory. Error code: {Marshal.GetLastWin32Error()}")
+            End If
+            Dim successWeaDur As Boolean = WriteProcessMemory(GameProcessPtr(), R1WeaponDuraAddress(), bufferWeapDura, bufferWeapDura.Length, bytesWritten)
+            If Not successWeaDur Then
+                Throw New Exception($"Failed to write Weapon Durability {weaponDura} into memory. Error code: {Marshal.GetLastWin32Error()}")
             End If
 
         Catch ex As Exception
@@ -239,7 +270,8 @@ Public Class WeaponSwapper
         _GameProcess = Nothing
         _GameProcessPtr = IntPtr.Zero
         _GameBaseAddress = IntPtr.Zero
-        _R1WeaponAddress = IntPtr.Zero
+        _R1WeaponIdAddress = IntPtr.Zero
+        _R1WeaponDuraAddress = IntPtr.Zero
     End Sub
 
 #End Region
