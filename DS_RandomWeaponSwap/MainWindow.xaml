@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DS_RandomWeaponSwap"
         mc:Ignorable="d"
-        Title="DS(R) Weapon Swap" Height="300" Width="380" ResizeMode="NoResize" Loaded="Window_Loaded">
+        Title="DSR Weapon Swap v1.1" Height="300" Width="380" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid Margin="12">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -27,7 +27,7 @@
             <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
 
-        <Label Grid.ColumnSpan="6" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Note: only for Dark Souls Remastered" FontStyle="Italic"/>
+        <Label Grid.ColumnSpan="6" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Only for Dark Souls Remastered" FontStyle="Italic"/>
 
         <GroupBox Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" Grid.ColumnSpan="4">
             <GroupBox.Header>

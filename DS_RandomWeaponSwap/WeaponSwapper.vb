@@ -219,19 +219,21 @@ Public Class WeaponSwapper
 
 
     Public Sub WriteIntoMemory(weaponId As Integer, Optional weaponDura As Integer = 999)
+        '02/2026 - v1.1:
+        'Added a fix for the durability issue (i.e. force weapon dura to 999)
+        'This is not 100% reliable but should be much better than 1st release
+        'Advice, never change your weapons using the menus, let the mod do so
+
         Dim bytesWritten As IntPtr
         Dim bufferWeaponId As Byte() = BitConverter.GetBytes(weaponId)
         Dim bufferWeapDura As Byte() = BitConverter.GetBytes(weaponDura)
 
         Try
             Dim successWeaponId As Boolean = WriteProcessMemory(GameProcessPtr(), R1WeaponIdAddress(), bufferWeaponId, bufferWeaponId.Length, bytesWritten)
-            If Not successWeaponId Then
-                Throw New Exception($"Failed to write Weapon Id {weaponId} into memory. Error code: {Marshal.GetLastWin32Error()}")
-            End If
-            Dim successWeaDur As Boolean = WriteProcessMemory(GameProcessPtr(), R1WeaponDuraAddress(), bufferWeapDura, bufferWeapDura.Length, bytesWritten)
-            If Not successWeaDur Then
-                Throw New Exception($"Failed to write Weapon Durability {weaponDura} into memory. Error code: {Marshal.GetLastWin32Error()}")
-            End If
+            If Not successWeaponId Then Throw New Exception($"Failed to write Weapon Id {weaponId} into memory. Error code: {Marshal.GetLastWin32Error()}")
+
+            Dim successWeapDura As Boolean = WriteProcessMemory(GameProcessPtr(), R1WeaponDuraAddress(), bufferWeapDura, bufferWeapDura.Length, bytesWritten)
+            If Not successWeapDura Then Throw New Exception($"Failed to write Weapon Durability {weaponDura} into memory. Error code: {Marshal.GetLastWin32Error()}")
 
         Catch ex As Exception
             Dim errMsg As String = $"An unexpected error occurred. Details: {ex}"
