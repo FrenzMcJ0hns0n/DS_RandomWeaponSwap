@@ -14,27 +14,6 @@ Public Class WeaponSwapper
     Private Const GAME_BASE_OFFSET As Integer = &H1C823A0
     Private ReadOnly R1WeaponIdOffsets As New List(Of Integer) From {&H8, &H0, &H7E8, &H28, &H328}
     Private ReadOnly R1WeaponDuraOffsets As New List(Of Integer) From {&H8, &H0, &H280, &H88, &H578, &HDB0}
-    Private ReadOnly MeleeCategories As New List(Of String) From {
-        "Daggers",
-        "Straight Swords",
-        "Greatswords",
-        "Ultra Greatswords",
-        "Curved Swords",
-        "Curved Greatswords",
-        "Katanas",
-        "Piercing Swords",
-        "Axes",
-        "Great Axes",
-        "Hammers",
-        "Great Hammers",
-        "Fist Weapons",
-        "Spears",
-        "Halberds",
-        "Others", 'e.g. Skull Lantern
-        "Shields",
-        "Greatshields",
-        "Whips"
-    }
     Public MeleeWeaponsOnly As Boolean
 
 #End Region
@@ -101,7 +80,7 @@ Public Class WeaponSwapper
         Get
             If _R1WeaponIdAddress = IntPtr.Zero Then
 
-                'Start from base address and move from one pointer to the next (except the last one)
+                'Start at base offset. Move from one pointer to the next (except the last one)
                 Dim targetAddress = GetValueAtAddress(GameBaseAddress() + GAME_BASE_OFFSET, 8)
                 Dim maxIndex As Integer = R1WeaponIdOffsets.Count - 1
                 For i As Integer = 0 To maxIndex
@@ -123,7 +102,7 @@ Public Class WeaponSwapper
         Get
             If _R1WeaponDuraAddress = IntPtr.Zero Then
 
-                'Start from base address and move from one pointer to the next (except the last one)
+                'Start at base offset. Move from one pointer to the next (except the last one)
                 Dim targetAddress = GetValueAtAddress(GameBaseAddress() + GAME_BASE_OFFSET, 8)
                 Dim maxIndex As Integer = R1WeaponDuraOffsets.Count - 1
                 For i As Integer = 0 To maxIndex
@@ -156,7 +135,7 @@ Public Class WeaponSwapper
 
                 Dim loadedWeapons As List(Of Weapon) = LoadWeaponData()
                 If MeleeWeaponsOnly Then
-                    _Weapons = loadedWeapons.Where(Function(w As Weapon) MeleeCategories.Contains(w.Category)).ToList
+                    _Weapons = loadedWeapons.Where(Function(w As Weapon) w.Melee).ToList
                 Else
                     _Weapons = loadedWeapons
                 End If
@@ -239,11 +218,9 @@ Public Class WeaponSwapper
     End Function
 
 
-    Public Sub WriteIntoMemory(weaponId As Integer)
+    Public Sub WriteIntoMemory(weaponId As Integer, Optional weaponDura As Integer = 999)
         Dim bytesWritten As IntPtr
         Dim bufferWeaponId As Byte() = BitConverter.GetBytes(weaponId)
-
-        Dim weaponDura As Integer = 200 'TODO: Get from weapon data
         Dim bufferWeapDura As Byte() = BitConverter.GetBytes(weaponDura)
 
         Try

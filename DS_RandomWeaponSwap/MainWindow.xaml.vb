@@ -94,7 +94,7 @@ Class MainWindow
 
         'Now do your job, program!
         Dim swapper As New WeaponSwapper() With {.MeleeWeaponsOnly = meleeWeaponsOnly}
-        If Application.IsDebug Then Debug.Print($"Id of current R1 weapon : {swapper.ReadFromMemory()}")
+        If Application.IsDebug Then Debug.Print($"Id of current R1 weapon: {swapper.ReadFromMemory()}")
 
         isRunning = True
         UpdateControls(isRunning)
@@ -104,8 +104,8 @@ Class MainWindow
             If Not isRunning Then Exit While
 
             Dim weapon As Weapon = swapper.GetRandomWeapon()
-            If Application.IsDebug Then Debug.Print($"(Swap every {intervalInSeconds}s) Random R1 weapon: Id={weapon.Id}, Name=""{weapon.Name}"", Category=""{weapon.Category}""")
-            swapper.WriteIntoMemory(weapon.Id)
+            If Application.IsDebug Then Debug.Print($"(Interval: {intervalInSeconds}s) New random R1 weapon: Id={weapon.Id}, Name=""{weapon.Name}"", Category=""{weapon.Category}""") ', Durability=""{weapon.Durability}""
+            swapper.WriteIntoMemory(weapon.Id) ', weapon.Durability
         End While
 
         UpdateControls(isRunning)
